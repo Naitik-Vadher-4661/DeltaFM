@@ -1,5 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+
 project(DeltaFM)
-cmake_minimum_required(VERSION 4.4.2)
+
 
 include(FetchContent)
 

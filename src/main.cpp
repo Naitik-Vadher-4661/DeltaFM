@@ -7,9 +7,9 @@ int main() {
 
    // Create a simple document with three text elements.
    Element document = hbox({
-     text("Delta")   | border,
-     text("C for Shivam") | border | flex,
-     text("FM")  | border,
+     text("DeltaFM")   | border,
+     text("first basic TUI ") | border | flex,
+
    });
 
    // Create a screen with full width and height fitting the document.

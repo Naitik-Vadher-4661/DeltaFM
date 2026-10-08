@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/naitik/Documents/projects/DeltaFM/src/cmake_install.cmake",
+		"/home/naitik/Documents/projects/DeltaFM/src/_deps/ftxui-build/cmake_install.cmake",
+		"/home/naitik/Documents/projects/DeltaFM/src/_deps/ftxui-build/examples/cmake_install.cmake",
+		"/home/naitik/Documents/projects/DeltaFM/src/_deps/ftxui-build/doc/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
