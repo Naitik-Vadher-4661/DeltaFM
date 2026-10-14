@@ -1,27 +1,15 @@
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/screen/screen.hpp>
-#include <iostream>
+#include <filesystem>
+#include<iostream>
+#include"../include//Filesystemitem.hpp"
+using namespace std;
 
-int main() {
-  using namespace ftxui;
+int main(){
+    Filesystemitem testf(fs::current_path());
 
-   // Create a simple document with three text elements.
-   Element document = hbox({
-     text("DeltaFM")   | border,
-     text("first basic TUI ") | border | flex,
+    cout<<"path: "<<testf.getpath().string()<<endl;
+    cout<<"name: "<<testf.getname()<<endl;
+    cout<<"size: "<<testf.getsize()<<endl;
+    cout <<"items: "<<Filesystemitem::getitemcount()<<endl;
 
-   });
-
-   // Create a screen with full width and height fitting the document.
-   auto screen = Screen::Create(
-     Dimension::Full(),       // Width
-     Dimension::Fit(document) // Height
-   );
-
-   // Render the document onto the screen.
-   Render(screen, document);
-
-   // Print the screen to the console.
-   screen.Print();
 
 }
