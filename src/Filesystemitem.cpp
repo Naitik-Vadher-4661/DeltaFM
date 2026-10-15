@@ -1,8 +1,7 @@
 
-#include<filesystem>
-#include<cstdint>
+
 #include "../include/Filesystemitem.hpp"
-// namespace fs = std::filesystem;
+// namespace fs = std::filesystem;   this is commented because include fsi.hpp has already declared fs
 
 int Filesystemitem::itemcount=0;     // declares the total objects
 

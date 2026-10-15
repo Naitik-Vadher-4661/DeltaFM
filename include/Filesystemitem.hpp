@@ -19,8 +19,8 @@ public:
         fs::path getpath();        // return path of the file/folder
         std::uintmax_t getsize();  //returns the size
        fs::file_time_type getmodifytime();   // return lasr modify time
-       // virtual std::string gettype() const = 0;   // this is for the type file or directory
-       // virtual std::string getdisplaytext() const = 0; // this is for displaying content of file
+        virtual std::string gettype() const = 0;   // this is for the type file or directory
+        virtual std::string getdisplaytext() const = 0; // this is for displaying content of file
         virtual ~Filesystemitem();   // destructor
         bool operator<(const Filesystemitem&) const ;   // this is for the sorting of file/folder
         static int getitemcount();  // this returns the itemcount
