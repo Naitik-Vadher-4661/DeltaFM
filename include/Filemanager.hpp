@@ -8,6 +8,7 @@ class Filemanager{
         int selectedIndex;
         bool showhidden;
     public:
+        Filemanager();
         void loaddirectory();
         void moveup();
         void movedown();

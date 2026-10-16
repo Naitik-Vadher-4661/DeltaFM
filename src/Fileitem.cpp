@@ -1,4 +1,4 @@
-#include "../include/fileitem.hpp"
+#include "../include/Fileitem.hpp"
 #include<fstream>
 
 std::string Fileitem:: gettype() const {
