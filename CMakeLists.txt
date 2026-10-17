@@ -16,7 +16,8 @@ FetchContent_MakeAvailable(ftxui)
 add_executable(${PROJECT_NAME}
    src/main.cpp
    src/Filesystemitem.cpp
-   src/fileitem.cpp
+   src/Fileitem.cpp
+   src/Filemanager.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

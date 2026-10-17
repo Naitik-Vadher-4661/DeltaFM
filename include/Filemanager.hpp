@@ -17,7 +17,8 @@ class Filemanager{
         void createfile(std::string);
         void createfolder(std::string);
         void deleteselected();
-        void renameselected();
+        void renameselected(std::string);
         void sortitem();
         void togglehidden();
+
 };

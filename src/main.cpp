@@ -1,7 +1,9 @@
 
+#include <filesystem>
 #include<iostream>
 #include"../include/Filesystemitem.hpp"
 #include "../include/Fileitem.hpp"
+#include "../include/Filemanager.hpp"
 using namespace std;
 
 int main(){
@@ -14,5 +16,6 @@ int main(){
     cout <<"items: "<<Filesystemitem::getitemcount()<<endl;
     cout<<"File type : "<<testf.gettype()<<endl;
     cout<<"initial Text :"<<testf.getdisplaytext()<<endl;
+
 
 }
