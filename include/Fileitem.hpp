@@ -6,7 +6,8 @@ class Fileitem: public Filesystemitem{
     protected:
         std::string type;
     public:
-        Fileitem(const fs::path& p):Filesystemitem(p){}
+        Fileitem(const fs::path& );
         std::string gettype() const;
         std::string getdisplaytext() const;
+        ~Fileitem();
 };

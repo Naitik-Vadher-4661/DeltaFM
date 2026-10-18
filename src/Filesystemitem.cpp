@@ -19,7 +19,7 @@ Filesystemitem::Filesystemitem(const fs::path& p){         // initialize the obj
     per=fs::status(p).permissions();
     ftime=last_write_time(p);
 
-    itemcount++;
+
 }
 
 std::string Filesystemitem::getname(){
