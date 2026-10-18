@@ -33,3 +33,10 @@ std::string Fileitem::getdisplaytext() const{
    return fline ;
 
 }
+
+Fileitem::~Fileitem(){
+    itemcount--;
+}
+Fileitem::Fileitem(const fs::path& p):Filesystemitem(p){
+    itemcount++;
+}
