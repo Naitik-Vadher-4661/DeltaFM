@@ -2,6 +2,7 @@
 #include<filesystem>
 #include<cstdint>
 #include<string>
+
  namespace fs=std::filesystem;
 
  class Filesystemitem{
@@ -20,9 +21,10 @@ public:
         std::uintmax_t getsize();  //returns the size
        fs::file_time_type getmodifytime();   // return lasr modify time
         virtual std::string gettype() const = 0;   // this is for the type file or directory
-        virtual std::string getdisplaytext() const = 0; // this is for displaying content of file
+        virtual std::string getdisplaytext()  = 0; // this is for displaying content of file
         virtual ~Filesystemitem();   // destructor
         bool operator<(const Filesystemitem&) const ;   // this is for the sorting of file/folder
         static int getitemcount();  // this returns the itemcount
-        fs::perms getperms();  //this retrun the permissions
+        std::string formatsize(std::uintmax_t bytes);
+        std::string getperms();  //this retrun the permissions
  };

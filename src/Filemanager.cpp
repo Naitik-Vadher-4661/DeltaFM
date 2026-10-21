@@ -1,16 +1,27 @@
 #include "../include/Filemanager.hpp"
 #include "../include/Fileitem.hpp"
 #include "../include/Directoryitem.hpp"
+#include "../include/Exception.hpp"
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <iostream>
 
-Filemanager::Filemanager(){
-    p=fs::current_path();
+Filemanager::Filemanager(fs::path initialpath){
+    p=initialpath;
+    totalitem=-1;
     selectedIndex=0;
     showhidden=false;
     loaddirectory();
 }
+
+ std::vector<std::unique_ptr<Filesystemitem>>& Filemanager::getitems(){
+     return items;
+ }
+
+ int Filemanager::getselected(){return selectedIndex;}
+ fs::path Filemanager::getpath(){return p;}
 
 void Filemanager::loaddirectory(){
     items.clear();
@@ -19,6 +30,7 @@ void Filemanager::loaddirectory(){
             if(showhidden){
             Fileitem f(dir_item);
             items.push_back(std::make_unique<Fileitem>(dir_item));
+            totalitem++;
             }
             else{
                 std::string n =dir_item.path().filename().string();
@@ -26,18 +38,21 @@ void Filemanager::loaddirectory(){
                 Fileitem f(dir_item);
 
                 items.push_back(std::make_unique<Fileitem>(dir_item));
+                totalitem++;
             }
         }
         else{
            if(showhidden){
                Directoryitem d(dir_item);
                items.push_back(std::make_unique<Directoryitem>(dir_item));
+               totalitem++;
            }
            else{
                std::string n=dir_item.path().filename().string();
                 if(n[0]=='.') continue;
                 Directoryitem d(dir_item);
                 items.push_back(std::make_unique<Directoryitem>(dir_item));
+                totalitem++;
            }
         }
     }
@@ -45,57 +60,109 @@ void Filemanager::loaddirectory(){
 }
 
 void Filemanager::moveup(){
-    if(selectedIndex);
+    if(selectedIndex==0);
     else{
         selectedIndex--;
     }
 }
 
 void Filemanager::movedown(){
-    Directoryitem d(fs::current_path());
-    int cur_dir_count=d.getitemcount();
-    if(selectedIndex<cur_dir_count){
+    if(selectedIndex<totalitem){
         selectedIndex++;
     }
+    else{}
 }
 
 void Filemanager::gotochild(){
-    if(items[selectedIndex]->gettype()=="folder")
+
+    if(items[selectedIndex]->gettype()=="Directory")
+    {
+
     p=items[selectedIndex]->getpath();
-loaddirectory();
+     selectedIndex=0;
+     loaddirectory();
+    }
+
+
 }
 
 void Filemanager::gotoparent(){
+
     p=p.parent_path();
+    selectedIndex=0;
     loaddirectory();
+
 }
 
 void Filemanager::createfile(std::string file_name){
+    try{
+        for(auto const& dir_item : fs::directory_iterator{p}){
+            if(file_name==dir_item.path().filename().string())
+                throw AlreadyExists(dir_item.path());
+        }
+    }
+     catch(FileException f){
+         std::cout<<f.what()<<std::endl;
+     }
     std::ofstream newfile(file_name);
     newfile.close();
     items.push_back(std::make_unique<Fileitem>(file_name));
 }
 
 void Filemanager::createfolder(std::string folder_name){
+    try{
+        for(auto const& dir_item : fs::directory_iterator{p}){
+            if(folder_name==dir_item.path().filename().string())
+                throw AlreadyExists(dir_item.path());
+        }
+    }
+     catch(FileException f){
+
+     }
     fs::create_directories(folder_name);
+    totalitem++;
     items.push_back(std::make_unique<Directoryitem>(folder_name));
 }
 
 void Filemanager::deleteselected(){
+    // try{
+    //     for(int i=0;i<selectedIndex;i++){
+    //         // if(items[i]->getperms()=)
+    //     }
+    // }
     fs::remove(items[selectedIndex]->getpath());
-
+    totalitem--;
+    loaddirectory();
 }
 
 void Filemanager::renameselected(std::string new_name){
-    fs::rename(items[selectedIndex]->getpath(),new_name);
+    try{
+        for(auto const& dir_item : fs::directory_iterator{p}){
+            if(new_name==dir_item.path().filename().string())
+            {
+
+                throw  AlreadyExists (dir_item.path()) ;
+
+            }
+
+
+        }
+        throw 2;
+    }
+
+     catch(int i){
+         fs::rename(items[selectedIndex]->getpath(),new_name);
+      }
+
+loaddirectory();
 }
 
-void Filemanager::sortitem(std::string sorttype="name"){
+void Filemanager::sortitem(){
     Directoryitem d(fs::current_path());
     int cur_dir_count=d.getitemcount();
 
     // sort by name
-    if(sorttype=="name"){
+
         std::string max=items[0]->getpath().filename().string();
 
         for(int i=0;i<cur_dir_count  ;i++){
@@ -109,13 +176,9 @@ void Filemanager::sortitem(std::string sorttype="name"){
                 continue;
             }
         }
-    }
-    else if(sorttype=="size"){
-        for (int i=0;i<cur_dir_count;i++){
-            if(items[i]<items[i+1])
-                items[i].swap(items[i+1]);
-        }
-    }
+
+
+loaddirectory();
 }
 
 void Filemanager::togglehidden(){

@@ -1,6 +1,7 @@
 #include "../include/Fileitem.hpp"
-#include<fstream>
-
+#include<format>
+#include<chrono>
+#include<cstdint>
 std::string Fileitem:: gettype() const {
 
     if(cur_path.extension()== ".txt"){
@@ -24,13 +25,18 @@ std::string Fileitem:: gettype() const {
     else if(cur_path.extension()== ".cpp"){return "C++";}
 return "uknown";
 }
-std::string Fileitem::getdisplaytext() const{
-   std::fstream file(cur_path);
-   std::string fline;
-   while (std::getline(file, fline) && fline.empty()) {
+std::string Fileitem::getdisplaytext() {
+std::string display_fileinfo;
 
-   }
-   return fline ;
+std::string modtime=std::format("{:%Y-%m-%d %H:%M}", ftime);
+
+//for size
+
+
+
+
+std::string sz=formatsize(size);
+return name+"                   "+modtime+"                 "+sz;
 
 }
 

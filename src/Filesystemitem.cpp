@@ -51,3 +51,40 @@ bool Filesystemitem::operator<(const Filesystemitem& f) const{
 Filesystemitem::~Filesystemitem() {
     itemcount--;
 }
+
+std::string Filesystemitem::getperms(){
+    using std::filesystem::perms;
+    std::string s;
+
+    auto show = [&](std::string op, perms perm)
+    {
+
+        s+=(perms::none == (per) ? "-" : op);
+    };
+    show("r", perms::owner_read);
+    show("w", perms::owner_write);
+    show("x", perms::owner_exec);
+    show("r", perms::group_read);
+    show("w", perms::group_write);
+    show("x", perms::group_exec);
+    show("r", perms::others_read);
+    show("w", perms::others_write);
+    show("x", perms::others_exec);
+    return s;
+}
+
+std::string Filesystemitem::formatsize(std::uintmax_t bytes) {
+       const char* units[] = {"B", "KB", "MB", "GB", "TB"};
+       double value = static_cast<double>(bytes);
+       int unit = 0;
+       while (value >= 1024.0 && unit < 4) {
+           value /= 1024.0;
+           unit++;
+       }
+       std::ostringstream out;
+       if (unit == 0)
+           out << bytes << " B";
+       else
+           out << std::fixed << std::setprecision(1) << value << " " << units[unit];
+       return out.str();
+   }

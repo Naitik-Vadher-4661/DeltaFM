@@ -8,6 +8,6 @@ class Fileitem: public Filesystemitem{
     public:
         Fileitem(const fs::path& );
         std::string gettype() const;
-        std::string getdisplaytext() const;
+        std::string getdisplaytext() ;
         ~Fileitem();
 };

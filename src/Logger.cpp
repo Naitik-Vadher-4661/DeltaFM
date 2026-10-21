@@ -1,21 +1,19 @@
-#include "Logger.hpp"
+#include "../include/Logger.hpp"
+#include <filesystem>
 
 #include <chrono>
-#include <ctime>
+#include <format>
 #include <fstream>
-#include <iomanip>
+// #include <iomanip>
 
-Logger::Logger(const std::string& file) : logFile(file) {}
 
-bool Logger::log(const std::string& message) {
-    std::ofstream out(logFile, std::ios::app);
-    if (!out) return false;
+Logger::Logger(fs::path logpath):logfile(logpath){}
 
-    std::time_t t = std::chrono::system_clock::to_time_t(
-        std::chrono::system_clock::now());
-    std::tm tm = *std::localtime(&t);
+void Logger::Log(std::string& msg,fs::file_time_type ft ) {
 
-    out << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << " | "
-        << (message.empty() ? "Unknown operation" : message) << '\n';
-    return true;
+   std::ofstream out( logfile.getpath());
+
+   std::string modtime=std::format("{:%Y-%m-%d %H:%M}", ft);
+
+   out<<modtime<<" : "<<msg<<std::endl;
 }
