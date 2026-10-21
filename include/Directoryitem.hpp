@@ -8,7 +8,7 @@ class Directoryitem:public Filesystemitem{
   public:
       Directoryitem(fs::path);
       std::string gettype() const ;
-      std::string getdisplaytext() const;
+      std::string getdisplaytext() ;
       int getcc();
       ~Directoryitem();
 };

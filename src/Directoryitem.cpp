@@ -7,18 +7,22 @@ std::string Directoryitem::gettype() const{
     return "Directory";
 }
 
-std::string Directoryitem::getdisplaytext() const{
+std::string Directoryitem::getdisplaytext() {
     std::string cc=std::to_string(childcount) ;
     std::string modtime=std::format("{:%Y-%m-%d %H:%M}", ftime);
-    return cc+" "+modtime;
+    return name+"               Directory"+"           "+cc+"               "+modtime;
 }
 
 Directoryitem::Directoryitem(fs::path dp):Filesystemitem(dp){
   itemcount++;
    childcount=0;
-   for (auto const& dir_entry : std::filesystem::directory_iterator{dp}){
-
-       childcount++;
+   std::error_code ec;
+   fs::directory_iterator it(dp, ec);
+   if (!ec) {
+       for (; it != fs::directory_iterator(); it.increment(ec)) {
+           if (ec) break;
+           childcount++;
+       }
    }
 }
 

@@ -1,11 +1,17 @@
 #pragma once
+#include "Fileitem.hpp"
 
+#include <filesystem>
+namespace fs=std::filesystem;
 #include <string>
 
 class Logger {
-    std::string logFile;
+
+    Fileitem logfile;
+
 
 public:
-    explicit Logger(const std::string& file = "deltafm.log");
-    bool log(const std::string& message = "Unknown operation");
+    Logger(fs::path logpath);
+    void Log(std::string&,fs::file_time_type);
+
 };
