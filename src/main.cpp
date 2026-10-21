@@ -5,10 +5,11 @@
 #include "../include/Fileitem.hpp"
 #include "../include/Directoryitem.hpp"
 #include "../include/Filemanager.hpp"
+#include "../include/previewer.hpp"
 using namespace std;
 
 int main(){
-    fs::path p="/home/naitik/Documents/projects/DeltaFM/src/main.cpp";
+    fs::path p="/home/known/DeltaFM/src/main.cpp";
    Fileitem testf(p);
 
     cout<<"path: "<<testf.getpath().string()<<endl;
@@ -21,6 +22,9 @@ int main(){
     fm.createfolder("nik");
     Directoryitem d("nik");
   cout<<"info abot directory : "<<d.gettype()<<" " <<d.getdisplaytext()<<" "<<d.getcc()<<endl;
-  cout<<"item count : "<<d.getitemcount();
+  cout<<"item count : "<<d.getitemcount()<<endl;
+
+  previewer test;
+  cout<<test.preview()<<endl;
 
 }
