@@ -1,4 +1,4 @@
-#include "../include/fileitem.hpp"
+#include "../include/Fileitem.hpp"
 #include<fstream>
 
 std::string Fileitem:: gettype() const {
@@ -32,4 +32,11 @@ std::string Fileitem::getdisplaytext() const{
    }
    return fline ;
 
+}
+
+Fileitem::~Fileitem(){
+    itemcount--;
+}
+Fileitem::Fileitem(const fs::path& p):Filesystemitem(p){
+    itemcount++;
 }
