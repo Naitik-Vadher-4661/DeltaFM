@@ -9,7 +9,6 @@ previewer::previewer()
 
 void previewer::loadpreview()
 {
-    text[0]='\0';
     fs::path path=items[selectedIndex]->getpath();
     std::error_code ec;
 
