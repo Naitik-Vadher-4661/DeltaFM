@@ -23,6 +23,7 @@ add_executable(${PROJECT_NAME}
    src/Filemanager.cpp
    src/Logger.cpp
    src/FilemanagerUI.cpp
+   src/previewer.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
