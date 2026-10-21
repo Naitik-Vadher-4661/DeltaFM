@@ -5,7 +5,6 @@ class previewer : public Filemanager {
     private:
         char text[500];
     public:
-        previewer();
-        void loadpreview();
+        previewer(std::filesystem::path);
         const char* preview();
 };
