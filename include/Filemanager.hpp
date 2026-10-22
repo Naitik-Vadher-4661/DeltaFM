@@ -23,7 +23,7 @@ class Filemanager{
         void createfolder(std::string);
         void deleteselected();
         void renameselected(std::string);
-        void sortitem();
+        void defaultsortitem() ;
         void togglehidden();
-
+        void swap(std::unique_ptr<Filesystemitem>& , std::unique_ptr<Filesystemitem>& );
 };

@@ -1,6 +1,8 @@
 
 
 #include "../include/Filesystemitem.hpp"
+#include "../include/Exception.hpp"
+#include <filesystem>
 // namespace fs = std::filesystem;   this is commented because include fsi.hpp has already declared fs
 
 int Filesystemitem::itemcount=0;     // declares the total objects
@@ -9,20 +11,31 @@ int Filesystemitem::itemcount=0;     // declares the total objects
 Filesystemitem::Filesystemitem(const fs::path& p){         // initialize the obj
     cur_path=p;
     name=p.filename().string();
-
+        try{
+            if(std::filesystem::exists(p)){
+                throw 2;
+            }
+            else{
+                throw NotFound(p);
+            }
+        }
+        catch(int i){
     if(!fs::is_directory(p)){
+
+
     size=fs::file_size(p);
+     ftime=last_write_time(p);
+
     }
     else{size=0;}
 
 
     per=fs::status(p).permissions();
-    ftime=last_write_time(p);
 
 
 }
-
-std::string Filesystemitem::getname(){
+}
+std::string Filesystemitem::getname()const {
 
     return name;
 }

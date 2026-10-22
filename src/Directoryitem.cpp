@@ -10,7 +10,7 @@ std::string Directoryitem::gettype() const{
 std::string Directoryitem::getdisplaytext() {
     std::string cc=std::to_string(childcount) ;
     std::string modtime=std::format("{:%Y-%m-%d %H:%M}", ftime);
-    return name+"               Directory"+"           "+cc+"               "+modtime;
+    return name+"/"+"               Directory"+"           "+cc+"               "+modtime;
 }
 
 Directoryitem::Directoryitem(fs::path dp):Filesystemitem(dp){

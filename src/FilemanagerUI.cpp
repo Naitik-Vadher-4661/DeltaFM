@@ -130,7 +130,7 @@ bool FilemanagerUI::onkey(Event event) {
             return true;
         }
         if (event == Event::Character('s')) {
-            deltafm.sortitem();
+            deltafm.defaultsortitem();
             setstatus("Sorted");
             return true;
         }

@@ -7,7 +7,8 @@
 #include <fstream>
 #include <memory>
 #include <iostream>
-
+#include <algorithm>
+#include <system_error>
 Filemanager::Filemanager(fs::path initialpath){
     p=initialpath;
     totalitem=-1;
@@ -24,10 +25,18 @@ Filemanager::Filemanager(fs::path initialpath){
  fs::path Filemanager::getpath(){return p;}
 
 void Filemanager::loaddirectory(){
+
     items.clear();
-    for(auto const& dir_item : fs::directory_iterator{p}){
+    totalitem=-1;
+    std::error_code ec;
+    for(auto const& dir_item : fs::directory_iterator{p,fs::directory_options::skip_permission_denied, ec}){
+        std::error_code stat_ec;
         if(!dir_item.is_directory()){
             if(showhidden){
+
+                if(stat_ec){
+                    continue;
+                }
             Fileitem f(dir_item);
             items.push_back(std::make_unique<Fileitem>(dir_item));
             totalitem++;
@@ -43,6 +52,12 @@ void Filemanager::loaddirectory(){
         }
         else{
            if(showhidden){
+               fs::perms perms = fs::status(dir_item).permissions();
+
+               if(stat_ec){
+                   continue;
+               }
+
                Directoryitem d(dir_item);
                items.push_back(std::make_unique<Directoryitem>(dir_item));
                totalitem++;
@@ -56,7 +71,7 @@ void Filemanager::loaddirectory(){
            }
         }
     }
-
+defaultsortitem();
 }
 
 void Filemanager::moveup(){
@@ -77,21 +92,53 @@ void Filemanager::gotochild(){
 
     if(items[selectedIndex]->gettype()=="Directory")
     {
+        try{
+            fs::perms perms = fs::status(items[selectedIndex]->getpath()).permissions();
 
-    p=items[selectedIndex]->getpath();
-     selectedIndex=0;
-     loaddirectory();
+
+                if ((perms & fs::perms::owner_read) == fs::perms::none ||
+                    (perms & fs::perms::owner_write) == fs::perms::none ||
+                    (perms & fs::perms::owner_exec) == fs::perms::none) {
+                    throw PermissionDenied(items[selectedIndex]->getpath());
+                }
+                else{
+                    throw 1;
+                }
+        }
+        catch(int i){
+
+            p=items[selectedIndex]->getpath();
+             selectedIndex=0;
+             loaddirectory();
+    }
+
     }
 
 
 }
 
 void Filemanager::gotoparent(){
+    for(int i=0;i<totalitem;i++){
+    try{
+        fs::perms perms = fs::status(items[i]->getpath()).permissions();
 
+
+            if ((perms & fs::perms::owner_read) == fs::perms::none ||
+                (perms & fs::perms::owner_write) == fs::perms::none ||
+                (perms & fs::perms::owner_exec) == fs::perms::none) {
+                if (i==totalitem-1)throw PermissionDenied(items[selectedIndex]->getpath());
+                continue;
+            }
+            else{
+                throw 1;
+            }
+    }
+    catch(int i){
     p=p.parent_path();
     selectedIndex=0;
     loaddirectory();
-
+    }
+    }
 }
 
 void Filemanager::createfile(std::string file_name){
@@ -122,6 +169,7 @@ void Filemanager::createfolder(std::string folder_name){
     fs::create_directories(folder_name);
     totalitem++;
     items.push_back(std::make_unique<Directoryitem>(folder_name));
+    loaddirectory();
 }
 
 void Filemanager::deleteselected(){
@@ -157,34 +205,26 @@ void Filemanager::renameselected(std::string new_name){
 loaddirectory();
 }
 
-void Filemanager::sortitem(){
-    Directoryitem d(fs::current_path());
-    int cur_dir_count=d.getitemcount();
+void swap(std::unique_ptr<Filesystemitem>& a, std::unique_ptr<Filesystemitem>& b) {
+    a.swap(b);
+}
 
-    // sort by name
+void Filemanager::defaultsortitem() {
+    std::stable_sort(items.begin(), items.end(),
+        [](const std::unique_ptr<Filesystemitem>& a,
+           const std::unique_ptr<Filesystemitem>& b) {
+            return a->getname() < b->getname();
+        });
 
-        std::string max=items[0]->getpath().filename().string();
-
-        for(int i=0;i<cur_dir_count  ;i++){
-
-            std::string cmp=items[i]->getpath().filename().string();
-            if(max[0]<cmp[i]){
-                items[0].swap(items[i]);
-                max=items[0]->getpath().filename().string();
-            }
-            else{
-                continue;
-            }
-        }
-
-
-loaddirectory();
 }
 
 void Filemanager::togglehidden(){
-    if(showhidden==1)
+    if(showhidden==1){
         showhidden=0;
+        loaddirectory();
+    }
     else{
         showhidden=1;
+        loaddirectory();
     }
 }
