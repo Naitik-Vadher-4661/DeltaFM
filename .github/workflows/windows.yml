@@ -27,19 +27,24 @@ jobs:
           path: build/_deps
           key: windows-deps-${{ hashFiles('**/CMakeLists.txt') }}
 
-      - name: Configure (Visual Studio 2022, x64)
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+      - name: Set up MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
 
       - name: Build
-        run: cmake --build build --config Release --parallel
+        run: cmake --build build --parallel
 
       - name: Test
         working-directory: build
-        run: ctest -C Release --output-on-failure --no-tests=ignore
+        run: ctest --output-on-failure --no-tests=ignore
 
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
           name: deltafm-windows-x64
-          path: build/Release/*.exe
+          path: build/*.exe
           if-no-files-found: warn
