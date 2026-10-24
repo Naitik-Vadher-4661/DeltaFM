@@ -1,17 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(DeltaFM)
 
-find_library(MAGIC_LIB magic REQUIRED)
-find_path(MAGIC_INCLUDE_DIR magic.h REQUIRED)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# libmagic: also search the Homebrew folders used on macOS
+find_library(MAGIC_LIB magic
+    HINTS /opt/homebrew/lib /usr/local/lib)
+find_path(MAGIC_INCLUDE_DIR magic.h
+    HINTS /opt/homebrew/include /usr/local/include)
 
 if(NOT MAGIC_LIB OR NOT MAGIC_INCLUDE_DIR)
     message(FATAL_ERROR
         "libmagic not found.\n"
         "Install it with:\n"
         "  Ubuntu/Debian:  sudo apt install libmagic-dev\n"
+        "  Arch:           sudo pacman -S file\n"
         "  macOS:          brew install libmagic\n"
         "  Windows:        vcpkg install libmagic"
     )
@@ -36,6 +41,11 @@ add_executable(${PROJECT_NAME}
    src/Logger.cpp
    src/FilemanagerUI.cpp
    src/previewer.cpp
+)
+
+target_include_directories(${PROJECT_NAME}
+    PRIVATE
+    ${MAGIC_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
