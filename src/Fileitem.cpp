@@ -21,7 +21,7 @@ else{
 display_name=name.substr(0,20);
 }
 
-full_line=display_name+tabs.substr(0,30)+" -    "+tabs.substr(0,30)+modtime+tabs.substr(0,20)+type;
+full_line="📄 "+display_name+tabs.substr(0,30)+" -    "+tabs.substr(0,30)+modtime+tabs.substr(0,20)+type;
 return full_line;
 
 }

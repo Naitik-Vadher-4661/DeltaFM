@@ -21,7 +21,7 @@ std::string Directoryitem::getdisplaytext() {
     }
     cc=tabs.substr(0,30)+cc+std::string(5-cc.length(),' ')+tabs.substr(0,30);
 
-    full_line=display_name+cc+modtime+tabs.substr(0,20)+"directory";
+    full_line="📁 "+display_name+cc+modtime+tabs.substr(0,20)+"directory";
     return full_line;
 }
 
