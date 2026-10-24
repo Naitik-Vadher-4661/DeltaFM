@@ -1,42 +1,28 @@
 #include "../include/Fileitem.hpp"
 #include<format>
 #include<chrono>
-#include<cstdint>
+#include<magic.h>
+//#include<cstdint>
 std::string Fileitem:: gettype() const {
+return type;
 
-    if(cur_path.extension()== ".txt"){
-        return "text";
-    }
-    else if(cur_path.extension()== ".jpg"||
-        cur_path.extension()== ".png"||
-        cur_path.extension()== "webp"||
-        cur_path.extension()== ".jpeg")
-    {
-            return "image";
-    }
-
-
-    else if(cur_path.extension()== ".mp3"){ return "audio";}
-    else if(cur_path.extension()== ".mp4"){return "video";}
-    else if(cur_path.extension()== ".html"){return "html";}
-    else if(cur_path.extension()== ".css"){return "css";}
-    else if(cur_path.extension()== ".js"){return "Javascript";}
-    else if(cur_path.extension()== ".c"){return "C";}
-    else if(cur_path.extension()== ".cpp"){return "C++";}
-return "uknown";
 }
 std::string Fileitem::getdisplaytext() {
-std::string display_fileinfo;
 
+std::string full_line;
 std::string modtime=std::format("{:%Y-%m-%d %H:%M}", ftime);
-
-//for size
-
-
-
-
 std::string sz=formatsize(size);
-return name+"                   "+modtime+"                 "+sz;
+std::string display_name=name;
+std::string tabs="                                                             ";
+if(display_name.length()<=20){
+    display_name=name.substr(0,name.length())+std::string(20-name.length(),' ');
+}
+else{
+display_name=name.substr(0,20);
+}
+
+full_line=display_name+tabs.substr(0,30)+" -    "+tabs.substr(0,30)+modtime+tabs.substr(0,20)+type;
+return full_line;
 
 }
 
@@ -45,4 +31,13 @@ Fileitem::~Fileitem(){
 }
 Fileitem::Fileitem(const fs::path& p):Filesystemitem(p){
     itemcount++;
+
+
+magic_t cookie = magic_open(MAGIC_MIME_TYPE);
+   magic_load(cookie, NULL);
+   const char* result = magic_file(cookie, cur_path.c_str());
+   std::string tp = result ? result : "unknown";
+
+   magic_close(cookie);
+   type=tp;
 }

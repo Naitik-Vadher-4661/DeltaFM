@@ -2,13 +2,14 @@
 #include "../include/Fileitem.hpp"
 #include "../include/Directoryitem.hpp"
 #include "../include/Exception.hpp"
-#include <cstdlib>
+
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <iostream>
 #include <algorithm>
 #include <system_error>
+
 Filemanager::Filemanager(fs::path initialpath){
     p=initialpath;
     totalitem=-1;
@@ -72,6 +73,7 @@ void Filemanager::loaddirectory(){
         }
     }
 defaultsortitem();
+
 }
 
 void Filemanager::moveup(){
@@ -118,26 +120,17 @@ void Filemanager::gotochild(){
 }
 
 void Filemanager::gotoparent(){
-    for(int i=0;i<totalitem;i++){
-    try{
-        fs::perms perms = fs::status(items[i]->getpath()).permissions();
 
+    if(!items.empty()){
+     p=items[0]->getpath().parent_path().parent_path();
 
-            if ((perms & fs::perms::owner_read) == fs::perms::none ||
-                (perms & fs::perms::owner_write) == fs::perms::none ||
-                (perms & fs::perms::owner_exec) == fs::perms::none) {
-                if (i==totalitem-1)throw PermissionDenied(items[selectedIndex]->getpath());
-                continue;
-            }
-            else{
-                throw 1;
-            }
-    }
-    catch(int i){
-    p=p.parent_path();
     selectedIndex=0;
     loaddirectory();
     }
+    else{
+        p=p.parent_path();
+        selectedIndex=0;
+        loaddirectory();
     }
 }
 
@@ -147,13 +140,13 @@ void Filemanager::createfile(std::string file_name){
             if(file_name==dir_item.path().filename().string())
                 throw AlreadyExists(dir_item.path());
         }
+        throw 2;
     }
-     catch(FileException f){
-         std::cout<<f.what()<<std::endl;
-     }
+     catch(int i){
     std::ofstream newfile(file_name);
     newfile.close();
     items.push_back(std::make_unique<Fileitem>(file_name));
+     }
 }
 
 void Filemanager::createfolder(std::string folder_name){
@@ -173,14 +166,27 @@ void Filemanager::createfolder(std::string folder_name){
 }
 
 void Filemanager::deleteselected(){
-    // try{
-    //     for(int i=0;i<selectedIndex;i++){
-    //         // if(items[i]->getperms()=)
-    //     }
-    // }
-    fs::remove(items[selectedIndex]->getpath());
-    totalitem--;
-    loaddirectory();
+    try{
+
+            fs::perms perms = fs::status(items[selectedIndex]->getpath()).permissions();
+
+
+                if ((perms & fs::perms::owner_read) == fs::perms::none ||
+                    (perms & fs::perms::owner_write) == fs::perms::none ||
+                    (perms & fs::perms::owner_exec) == fs::perms::none) {
+                    throw PermissionDenied(items[selectedIndex]->getpath());
+
+                }
+                else{
+                    throw 2;
+                }
+
+    }
+    catch(int i){
+        fs::remove(items[selectedIndex]->getpath());
+        totalitem--;
+        loaddirectory();
+    }
 }
 
 void Filemanager::renameselected(std::string new_name){
@@ -190,7 +196,7 @@ void Filemanager::renameselected(std::string new_name){
             {
 
                 throw  AlreadyExists (dir_item.path()) ;
-
+                break;
             }
 
 

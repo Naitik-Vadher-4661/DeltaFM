@@ -4,6 +4,18 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(DeltaFM)
 
+find_library(MAGIC_LIB magic REQUIRED)
+find_path(MAGIC_INCLUDE_DIR magic.h REQUIRED)
+
+if(NOT MAGIC_LIB OR NOT MAGIC_INCLUDE_DIR)
+    message(FATAL_ERROR
+        "libmagic not found.\n"
+        "Install it with:\n"
+        "  Ubuntu/Debian:  sudo apt install libmagic-dev\n"
+        "  macOS:          brew install libmagic\n"
+        "  Windows:        vcpkg install libmagic"
+    )
+endif()
 
 include(FetchContent)
 
@@ -31,4 +43,5 @@ target_link_libraries(${PROJECT_NAME}
     ftxui::screen
     ftxui::dom
     ftxui::component
+    ${MAGIC_LIB}
 )
