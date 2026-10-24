@@ -41,11 +41,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build clang
-
+         
+          sudo apt-get update
+          sudo apt-get install -y libmagic-dev
+  
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: brew install cmake ninja
-
+             brew install libmagic
       - name: Cache CMake FetchContent downloads
         uses: actions/cache@v4
         with:
