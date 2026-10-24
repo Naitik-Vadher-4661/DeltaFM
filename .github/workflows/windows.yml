@@ -21,6 +21,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install libmagic
+        run: '& "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install libmagic:x64-windows'
+
       - name: Cache CMake FetchContent downloads
         uses: actions/cache@v4
         with:
@@ -33,7 +36,7 @@ jobs:
           arch: x64
 
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --parallel
@@ -46,5 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deltafm-windows-x64
-          path: build/*.exe
+          path: |
+            build/*.exe
+            build/*.dll
           if-no-files-found: warn
