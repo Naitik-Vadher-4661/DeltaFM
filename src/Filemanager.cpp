@@ -143,9 +143,9 @@ void Filemanager::createfile(std::string file_name){
         throw 2;
     }
      catch(int i){
-    std::ofstream newfile(file_name);
+    std::ofstream newfile(p.string()+"/"+file_name);
     newfile.close();
-    items.push_back(std::make_unique<Fileitem>(file_name));
+    loaddirectory();
      }
 }
 
@@ -155,38 +155,39 @@ void Filemanager::createfolder(std::string folder_name){
             if(folder_name==dir_item.path().filename().string())
                 throw AlreadyExists(dir_item.path());
         }
+        throw 2;
     }
-     catch(FileException f){
-
+     catch(int i){
+         fs::create_directories(p.string()+"/"+folder_name);
+         loaddirectory();
      }
-    fs::create_directories(folder_name);
-    totalitem++;
-    items.push_back(std::make_unique<Directoryitem>(folder_name));
-    loaddirectory();
+
 }
 
 void Filemanager::deleteselected(){
-    try{
-
-            fs::perms perms = fs::status(items[selectedIndex]->getpath()).permissions();
 
 
-                if ((perms & fs::perms::owner_read) == fs::perms::none ||
-                    (perms & fs::perms::owner_write) == fs::perms::none ||
-                    (perms & fs::perms::owner_exec) == fs::perms::none) {
-                    throw PermissionDenied(items[selectedIndex]->getpath());
+    fs::path p = items[selectedIndex]->getpath();
 
-                }
-                else{
-                    throw 2;
-                }
-
+    std::error_code ec;
+    fs::remove(p, ec);
+    if (ec == std::errc::directory_not_empty){
+        fs::remove_all(p);
     }
-    catch(int i){
-        fs::remove(items[selectedIndex]->getpath());
-        totalitem--;
-        loaddirectory();
+    else if (ec) {
+        if (ec == std::errc::no_such_file_or_directory)
+            throw NotFound(p);
+        if (ec == std::errc::permission_denied ||
+            ec == std::errc::operation_not_permitted)
+            throw PermissionDenied(p);
+
+        throw FileException(ec.message());
     }
+
+    totalitem--;
+
+    if(selectedIndex!=0) selectedIndex--;
+    loaddirectory();
 }
 
 void Filemanager::renameselected(std::string new_name){

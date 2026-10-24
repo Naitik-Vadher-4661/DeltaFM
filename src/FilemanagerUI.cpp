@@ -44,7 +44,7 @@ Element FilemanagerUI::buildscreen() {
         buildlist(),
         separator(),
         text(" " + statusmsg),
-        text(" Up/Down move | Enter open | Backspace up | n file | f folder | r rename | d delete | s sort | h hidden | q quit") | dim,
+        text(" Up/Down move | Right open | Left up | n file | f folder | r rename | d delete | s sort | h hidden | q quit") | dim,
     }) | border;
     if (mode == Mode::Confirming) {
            const auto& items = deltafm.getitems();
