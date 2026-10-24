@@ -2,11 +2,13 @@
 #include "../include/Fileitem.hpp"
 #include "../include/Directoryitem.hpp"
 #include "../include/Exception.hpp"
-#include <cstdlib>
+
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <iostream>
+#include <algorithm>
+#include <system_error>
 
 Filemanager::Filemanager(fs::path initialpath){
     p=initialpath;
@@ -24,10 +26,18 @@ Filemanager::Filemanager(fs::path initialpath){
  fs::path Filemanager::getpath(){return p;}
 
 void Filemanager::loaddirectory(){
+
     items.clear();
-    for(auto const& dir_item : fs::directory_iterator{p}){
+    totalitem=-1;
+    std::error_code ec;
+    for(auto const& dir_item : fs::directory_iterator{p,fs::directory_options::skip_permission_denied, ec}){
+        std::error_code stat_ec;
         if(!dir_item.is_directory()){
             if(showhidden){
+
+                if(stat_ec){
+                    continue;
+                }
             Fileitem f(dir_item);
             items.push_back(std::make_unique<Fileitem>(dir_item));
             totalitem++;
@@ -43,6 +53,12 @@ void Filemanager::loaddirectory(){
         }
         else{
            if(showhidden){
+               fs::perms perms = fs::status(dir_item).permissions();
+
+               if(stat_ec){
+                   continue;
+               }
+
                Directoryitem d(dir_item);
                items.push_back(std::make_unique<Directoryitem>(dir_item));
                totalitem++;
@@ -56,6 +72,7 @@ void Filemanager::loaddirectory(){
            }
         }
     }
+defaultsortitem();
 
 }
 
@@ -77,10 +94,26 @@ void Filemanager::gotochild(){
 
     if(items[selectedIndex]->gettype()=="Directory")
     {
+        try{
+            fs::perms perms = fs::status(items[selectedIndex]->getpath()).permissions();
 
-    p=items[selectedIndex]->getpath();
-     selectedIndex=0;
-     loaddirectory();
+
+                if ((perms & fs::perms::owner_read) == fs::perms::none ||
+                    (perms & fs::perms::owner_write) == fs::perms::none ||
+                    (perms & fs::perms::owner_exec) == fs::perms::none) {
+                    throw PermissionDenied(items[selectedIndex]->getpath());
+                }
+                else{
+                    throw 1;
+                }
+        }
+        catch(int i){
+
+            p=items[selectedIndex]->getpath();
+             selectedIndex=0;
+             loaddirectory();
+    }
+
     }
 
 
@@ -88,10 +121,17 @@ void Filemanager::gotochild(){
 
 void Filemanager::gotoparent(){
 
-    p=p.parent_path();
+    if(!items.empty()){
+     p=items[0]->getpath().parent_path().parent_path();
+
     selectedIndex=0;
     loaddirectory();
-
+    }
+    else{
+        p=p.parent_path();
+        selectedIndex=0;
+        loaddirectory();
+    }
 }
 
 void Filemanager::createfile(std::string file_name){
@@ -100,13 +140,13 @@ void Filemanager::createfile(std::string file_name){
             if(file_name==dir_item.path().filename().string())
                 throw AlreadyExists(dir_item.path());
         }
+        throw 2;
     }
-     catch(FileException f){
-         std::cout<<f.what()<<std::endl;
-     }
-    std::ofstream newfile(file_name);
+     catch(int i){
+    std::ofstream newfile(p.string()+"/"+file_name);
     newfile.close();
-    items.push_back(std::make_unique<Fileitem>(file_name));
+    loaddirectory();
+     }
 }
 
 void Filemanager::createfolder(std::string folder_name){
@@ -115,23 +155,38 @@ void Filemanager::createfolder(std::string folder_name){
             if(folder_name==dir_item.path().filename().string())
                 throw AlreadyExists(dir_item.path());
         }
+        throw 2;
     }
-     catch(FileException f){
-
+     catch(int i){
+         fs::create_directories(p.string()+"/"+folder_name);
+         loaddirectory();
      }
-    fs::create_directories(folder_name);
-    totalitem++;
-    items.push_back(std::make_unique<Directoryitem>(folder_name));
+
 }
 
 void Filemanager::deleteselected(){
-    // try{
-    //     for(int i=0;i<selectedIndex;i++){
-    //         // if(items[i]->getperms()=)
-    //     }
-    // }
-    fs::remove(items[selectedIndex]->getpath());
+
+
+    fs::path p = items[selectedIndex]->getpath();
+
+    std::error_code ec;
+    fs::remove(p, ec);
+    if (ec == std::errc::directory_not_empty){
+        fs::remove_all(p);
+    }
+    else if (ec) {
+        if (ec == std::errc::no_such_file_or_directory)
+            throw NotFound(p);
+        if (ec == std::errc::permission_denied ||
+            ec == std::errc::operation_not_permitted)
+            throw PermissionDenied(p);
+
+        throw FileException(ec.message());
+    }
+
     totalitem--;
+
+    if(selectedIndex!=0) selectedIndex--;
     loaddirectory();
 }
 
@@ -142,7 +197,7 @@ void Filemanager::renameselected(std::string new_name){
             {
 
                 throw  AlreadyExists (dir_item.path()) ;
-
+                break;
             }
 
 
@@ -157,34 +212,26 @@ void Filemanager::renameselected(std::string new_name){
 loaddirectory();
 }
 
-void Filemanager::sortitem(){
-    Directoryitem d(fs::current_path());
-    int cur_dir_count=d.getitemcount();
+void swap(std::unique_ptr<Filesystemitem>& a, std::unique_ptr<Filesystemitem>& b) {
+    a.swap(b);
+}
 
-    // sort by name
+void Filemanager::defaultsortitem() {
+    std::stable_sort(items.begin(), items.end(),
+        [](const std::unique_ptr<Filesystemitem>& a,
+           const std::unique_ptr<Filesystemitem>& b) {
+            return a->getname() < b->getname();
+        });
 
-        std::string max=items[0]->getpath().filename().string();
-
-        for(int i=0;i<cur_dir_count  ;i++){
-
-            std::string cmp=items[i]->getpath().filename().string();
-            if(max[0]<cmp[i]){
-                items[0].swap(items[i]);
-                max=items[0]->getpath().filename().string();
-            }
-            else{
-                continue;
-            }
-        }
-
-
-loaddirectory();
 }
 
 void Filemanager::togglehidden(){
-    if(showhidden==1)
+    if(showhidden==1){
         showhidden=0;
+        loaddirectory();
+    }
     else{
         showhidden=1;
+        loaddirectory();
     }
 }

@@ -17,7 +17,7 @@ protected:
         static int itemcount;           //this is intem counte that how much items are there in whole filesystem
 public:
         Filesystemitem(const fs::path& p);
-        std::string getname();  //return file/folder name
+        std::string getname() const;  //return file/folder name
         fs::path getpath();        // return path of the file/folder
         std::uintmax_t getsize();  //returns the size
        fs::file_time_type getmodifytime();   // return lasr modify time

@@ -1,6 +1,5 @@
 #include "../include/FilemanagerUI.hpp"
 #include "../include/Exception.hpp"
-
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 
@@ -45,9 +44,23 @@ Element FilemanagerUI::buildscreen() {
         buildlist(),
         separator(),
         text(" " + statusmsg),
-        text(" Up/Down move | Enter open | Backspace up | n file | f folder | r rename | d delete | s sort | h hidden | q quit") | dim,
+        text(" Up/Down move | Right open | Left up | n file | f folder | r rename | d delete | s sort | h hidden | q quit") | dim,
     }) | border;
+    if (mode == Mode::Confirming) {
+           const auto& items = deltafm.getitems();
+           std::string name = items.empty() ? "" : items[deltafm.getselected()]->getname();
 
+           Element popup = vbox({
+               text("Delete \"" + name + "\"?") | bold,
+               text(""),
+               text("It will be permanently deleted") | color(Color::Red),
+               text("and cannot be recovered.") | color(Color::Red),
+               separator(),
+               text("y = yes, delete    n = no, cancel") | dim,
+           }) | border | clear_under | size(WIDTH, GREATER_THAN, 40);
+
+           return dbox({body, popup | center});
+       }
     if (mode == Mode::Typing) {
         std::string prompt;
         switch (pendingaction) {
@@ -73,7 +86,29 @@ bool FilemanagerUI::onkey(Event event) {
     if (mode == Mode::Typing) {
         return handletype(event);
     }
-
+    if (mode == Mode::Confirming) {
+           if (event == Event::Character('y') || event == Event::Character('Y')) {
+               const auto& items = deltafm.getitems();
+               if (!items.empty()) {
+                   std::string name = items[deltafm.getselected()]->getname();
+                   try {
+                       deltafm.deleteselected();
+                       setstatus("Deleted " + name);
+                   } catch (const FileException& e) {
+                       setstatus(e.what());
+                   }
+               }
+               mode = Mode::Browsing;
+               return true;
+           }
+           if (event == Event::Character('n') || event == Event::Character('N') ||
+               event == Event::Escape) {
+               mode = Mode::Browsing;
+               setstatus("Delete cancelled");
+               return true;
+           }
+           return true;
+    }
     try {
         if (event == Event::ArrowUp) {
             deltafm.moveup();
@@ -119,18 +154,16 @@ bool FilemanagerUI::onkey(Event event) {
         }
         if (event == Event::Character('d')) {
             const auto& items = deltafm.getitems();
-            if (items.empty()) {
-                setstatus("Nothing to delete");
-                return true;
-            }
-            std::string name = items[deltafm.getselected()]->getname();
+                       if (items.empty()) {
+                           setstatus("Nothing to delete");
+                           return true;
+                       }
 
-            deltafm.deleteselected();
-            setstatus("Deleted " + name);
-            return true;
+                       mode = Mode::Confirming;
+                       return true;
         }
         if (event == Event::Character('s')) {
-            deltafm.sortitem();
+            deltafm.defaultsortitem();
             setstatus("Sorted");
             return true;
         }
@@ -183,17 +216,17 @@ void FilemanagerUI::finishtype() {
             case Action::CreateFile:
                 setstatus("Created file " + inputtext);
                 deltafm.createfile(inputtext);
-
+                deltafm.loaddirectory();
                 break;
             case Action::CreateFolder:
                 setstatus("Created folder " + inputtext);
                 deltafm.createfolder(inputtext);
-
+                deltafm.loaddirectory();
                 break;
             case Action::Rename:
                  setstatus("Renamed to " + inputtext);
                 deltafm.renameselected(inputtext);
-
+                deltafm.loaddirectory();
                 break;
             case Action::None : break;
         }
@@ -212,7 +245,7 @@ void FilemanagerUI::run() {
     auto renderer = Renderer([&] { return buildscreen(); });
 
     auto app = CatchEvent(renderer, [&](Event event) {
-        // 'q' quits only while browsing, so it can still be typed in a name
+
         if (mode == Mode::Browsing && event == Event::Character('q')) {
             screen.Exit();
             return true;
