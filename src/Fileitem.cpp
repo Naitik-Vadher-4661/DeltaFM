@@ -33,11 +33,18 @@ Fileitem::Fileitem(const fs::path& p):Filesystemitem(p){
     itemcount++;
 
 
-magic_t cookie = magic_open(MAGIC_MIME_TYPE);
-   magic_load(cookie, NULL);
-   const char* result = magic_file(cookie, cur_path.c_str());
-   std::string tp = result ? result : "unknown";
+    std::string pathstr = p.string();
+    type = "File";
 
-   magic_close(cookie);
-   type=tp;
+    magic_t magic = magic_open(MAGIC_MIME_TYPE);
+    if (magic != nullptr) {
+        if (magic_load(magic, nullptr) == 0) {
+            const char* result = magic_file(magic, pathstr.c_str());
+            if (result != nullptr) {
+                type = result;
+            }
+        }
+        magic_close(magic);
+
+     }
 }
