@@ -1,4 +1,4 @@
-### DeltaFM
+# DeltaFM
 A TUI based File Manager Written in c++ 
 
 
@@ -17,12 +17,12 @@ A TUI based File Manager Written in c++
                                                                                                                 
                                                                                                                        
                                                                                                                        
-### Installation
+# Installation
 
 ## Pre-built Binary(Recommanded)
  use dfm command to use DeltaFM after installing it
  
-# For Arch/Cachy
+### For Arch/Cachy
 ```
 sudo pacman -S --needed file
 curl -fL -o DeltaFM https://github.com/Naitik-Vadher-4661/DeltaFM/releases/download/Deltafm/DeltaFM_linux
@@ -31,7 +31,7 @@ sudo mv DeltaFM /usr/local/bin/dfm
 dfm
 ```
 
-# For ubuntu/Debian
+### For ubuntu/Debian
 ```
 sudo apt update
 sudo apt install -y libmagic1
@@ -41,7 +41,7 @@ sudo mv DeltaFM /usr/local/bin/dfm
 dfm
 ```
 
-# For MacOS
+### For MacOS
 ```
 brew install libmagic
 curl -fL -o DeltaFM https://github.com/Naitik-Vadher-4661/DeltaFM/releases/download/Deltafm/DeltaFM_mac
@@ -51,7 +51,7 @@ sudo mv DeltaFM /usr/local/bin/dfm
 dfm
 ```
 
-# for Windows
+### for Windows
 ```
 vcpkg install libmagic:x64-windows
 mkdir C:\DeltaFM\bin
@@ -120,7 +120,7 @@ Close PowerShell, open a new one and  run `dfm`.
  ```
 
 
-## Uninstallation
+# Uninstallation
 
 #### Arch / CachyOS
 ```
