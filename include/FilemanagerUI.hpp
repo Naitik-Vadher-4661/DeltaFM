@@ -10,12 +10,13 @@ class FilemanagerUI{
         Filemanager deltafm;
         std::string statusmsg;
         enum class Mode { Browsing, Typing, Confirming };
-        std::string inputtext;
-
         enum class Action { None, CreateFile, CreateFolder, Rename };
+        std::string inputtext;
+        Mode mode;
+        Action pendingaction;
 
-          Mode mode;
-          Action pendingaction;
+
+
     public:
 
     FilemanagerUI(const fs::path&);
