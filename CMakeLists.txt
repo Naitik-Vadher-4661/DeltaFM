@@ -55,3 +55,6 @@ target_link_libraries(${PROJECT_NAME}
     ftxui::component
     ${MAGIC_LIB}
 )
+install(PROGRAMS $<TARGET_FILE:${PROJECT_NAME}>
+        DESTINATION bin
+        RENAME dfm${CMAKE_EXECUTABLE_SUFFIX})
