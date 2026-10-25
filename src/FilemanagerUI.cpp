@@ -2,6 +2,7 @@
 #include "../include/Exception.hpp"
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
+#include <ftxui/dom/elements.hpp>
 
 using namespace ftxui;
 
@@ -31,7 +32,7 @@ Element FilemanagerUI::buildlist() {
     }
 
     if (rows.empty()) {
-        rows.push_back(text(" (empty folder)") | dim);
+        rows.push_back(text(" empty folder") | dim);
     }
 
     return vbox(std::move(rows)) | vscroll_indicator | yframe | flex;
@@ -39,12 +40,15 @@ Element FilemanagerUI::buildlist() {
 
 Element FilemanagerUI::buildscreen() {
     Element body = vbox({
+        text("𝚫 Delta FM") | bold  ,
+        separator(),
         text(" " + deltafm.getpath().string()) | bold,
         separator(),
+        text("     NAME                                             Items Contain                       Modify Time  🕘                       Type")| bold,
         buildlist(),
         separator(),
         text(" " + statusmsg),
-        text(" Up/Down move | Right open | Left up | n file | f folder | r rename | d delete | s sort | h hidden | q quit") | dim,
+        text(" ↑ up | ↓ down | → open | ← previous | n file | f folder | r rename | d delete | s sort | h hidden | q quit") | dim,
     }) | border;
     if (mode == Mode::Confirming) {
            const auto& items = deltafm.getitems();
