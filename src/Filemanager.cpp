@@ -91,7 +91,12 @@ void Filemanager::movedown(){
 }
 
 void Filemanager::gotochild(){
-
+try{
+    if(items.empty())
+	{
+		throw EmptyFolder(p);
+	}
+else{
     if(items[selectedIndex]->gettype()=="Directory")
     {
         try{
@@ -115,8 +120,9 @@ void Filemanager::gotochild(){
     }
 
     }
-
-
+}
+}
+catch(char c){}
 }
 
 void Filemanager::gotoparent(){
