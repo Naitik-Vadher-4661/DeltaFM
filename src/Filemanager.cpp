@@ -31,13 +31,11 @@ void Filemanager::loaddirectory(){
     totalitem=-1;
     std::error_code ec;
     for(auto const& dir_item : fs::directory_iterator{p,fs::directory_options::skip_permission_denied, ec}){
-        std::error_code stat_ec;
+        if(!dir_item.exists()) continue;
         if(!dir_item.is_directory()){
             if(showhidden){
 
-                if(stat_ec){
-                    continue;
-                }
+
             Fileitem f(dir_item);
             items.push_back(std::make_unique<Fileitem>(dir_item));
             totalitem++;
@@ -46,18 +44,12 @@ void Filemanager::loaddirectory(){
                 std::string n =dir_item.path().filename().string();
                 if(n[0]=='.') continue;
                 Fileitem f(dir_item);
-
                 items.push_back(std::make_unique<Fileitem>(dir_item));
                 totalitem++;
             }
         }
         else{
            if(showhidden){
-               fs::perms perms = fs::status(dir_item).permissions();
-
-               if(stat_ec){
-                   continue;
-               }
 
                Directoryitem d(dir_item);
                items.push_back(std::make_unique<Directoryitem>(dir_item));
