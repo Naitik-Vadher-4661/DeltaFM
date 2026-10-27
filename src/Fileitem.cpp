@@ -2,6 +2,7 @@
 #include<format>
 #include<chrono>
 #include<magic.h>
+
 //#include<cstdint>
 std::string Fileitem:: gettype() const {
 return type;
@@ -12,16 +13,15 @@ std::string Fileitem::getdisplaytext() {
 std::string full_line;
 std::string modtime=std::format("{:%Y-%m-%d %H:%M}", ftime);
 std::string sz=formatsize(size);
-std::string display_name=name;
-std::string tabs="                                                             ";
-if(display_name.length()<=20){
-    display_name=name.substr(0,name.length())+std::string(20-name.length(),' ');
-}
-else{
-display_name=name.substr(0,20);
-}
 
-full_line="📄 "+display_name+tabs.substr(0,30)+" -    "+tabs.substr(0,30)+modtime+tabs.substr(0,20)+type;
+
+std::ostringstream oss;
+oss << "📄 "
+    << std::left << std::setw(25) << name
+    << std::setw(12) << formatsize(size)
+    << std::setw(20) << modtime
+    << type;
+full_line = oss.str();
 return full_line;
 
 }

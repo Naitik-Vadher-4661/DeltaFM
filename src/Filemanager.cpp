@@ -15,6 +15,7 @@ Filemanager::Filemanager(fs::path initialpath){
     totalitem=-1;
     selectedIndex=0;
     showhidden=false;
+    sort_count=0;   //if this is 0 then normal sort, if is 1 then sort by size
     loaddirectory();
 }
 
@@ -209,11 +210,24 @@ void swap(std::unique_ptr<Filesystemitem>& a, std::unique_ptr<Filesystemitem>& b
 }
 
 void Filemanager::defaultsortitem() {
+if(sort_count==0)
+{
     std::stable_sort(items.begin(), items.end(),
         [](const std::unique_ptr<Filesystemitem>& a,
            const std::unique_ptr<Filesystemitem>& b) {
             return a->getname() < b->getname();
         });
+    sort_count=1;
+}
+else if(sort_count==1) {
+    std::stable_sort(items.begin(), items.end(),
+        [](const std::unique_ptr<Filesystemitem>& a,
+           const std::unique_ptr<Filesystemitem>& b) {
+            return *a < *b;
+        });
+    sort_count=0;
+}
+
 
 }
 

@@ -9,6 +9,7 @@ class Filemanager{
         int selectedIndex;
         bool showhidden;
         int totalitem;
+        int sort_count;
     public:
         Filemanager(fs::path intialpath);
         void loaddirectory();

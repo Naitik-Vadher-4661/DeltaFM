@@ -3,6 +3,7 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <string>
 
 using namespace ftxui;
 
@@ -39,12 +40,18 @@ Element FilemanagerUI::buildlist() {
 }
 
 Element FilemanagerUI::buildscreen() {
+    std::ostringstream oss;
+    oss << std::left << std::setw(30) << "Name"
+        << std::setw(12) << "Size"
+        << std::setw(20) << "Modify time"
+        << "Type";
+    std::string title=oss.str();
     Element body = vbox({
         text("𝚫 Delta FM") | bold  ,
         separator(),
         text(" " + deltafm.getpath().string()) | bold,
         separator(),
-        text("     NAME                                             Items Contain                       Modify Time  🕘                       Type")| bold,
+        text(title)| bold,
         buildlist(),
         separator(),
         text(" " + statusmsg),
