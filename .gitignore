@@ -20,3 +20,4 @@ deps/
 .DS_Store
 Thumbs.db
 DeltaFM
+build/
