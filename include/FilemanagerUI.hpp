@@ -4,13 +4,12 @@
 #include <ftxui/component/event.hpp>
 #include <string>
 #include "Filemanager.hpp"
-
 class FilemanagerUI{
     protected:
         Filemanager deltafm;
         std::string statusmsg;
         enum class Mode { Browsing, Typing, Confirming };
-        enum class Action { None, CreateFile, CreateFolder, Rename };
+        enum class Action { None, CreateFile, CreateFolder, Rename};
         std::string inputtext;
         Mode mode;
         Action pendingaction;

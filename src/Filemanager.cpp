@@ -1,21 +1,23 @@
+
 #include "../include/Filemanager.hpp"
 #include "../include/Fileitem.hpp"
 #include "../include/Directoryitem.hpp"
 #include "../include/Exception.hpp"
-
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <iostream>
 #include <algorithm>
 #include <system_error>
-
+#include<cstring>
 Filemanager::Filemanager(fs::path initialpath){
     p=initialpath;
     totalitem=-1;
     selectedIndex=0;
     showhidden=false;
-    sort_count=0;   //if this is 0 then normal sort, if is 1 then sort by size
+    changesort=0;
+    previewtext="Empty file!";
+    previewMode=0;
     loaddirectory();
 }
 
@@ -119,7 +121,8 @@ catch(char c){}
 }
 
 void Filemanager::gotoparent(){
-
+	if(fs::current_path().root_path()==p){}
+	else{
     if(!items.empty()){
      p=items[0]->getpath().parent_path().parent_path();
 
@@ -131,6 +134,7 @@ void Filemanager::gotoparent(){
         selectedIndex=0;
         loaddirectory();
     }
+}
 }
 
 void Filemanager::createfile(std::string file_name){
@@ -216,22 +220,22 @@ void swap(std::unique_ptr<Filesystemitem>& a, std::unique_ptr<Filesystemitem>& b
 }
 
 void Filemanager::defaultsortitem() {
-if(sort_count==0)
+if(changesort==0)
 {
     std::stable_sort(items.begin(), items.end(),
         [](const std::unique_ptr<Filesystemitem>& a,
            const std::unique_ptr<Filesystemitem>& b) {
             return a->getname() < b->getname();
         });
-    sort_count=1;
+    changesort=1;
 }
-else if(sort_count==1) {
+else if(changesort==1) {
     std::stable_sort(items.begin(), items.end(),
         [](const std::unique_ptr<Filesystemitem>& a,
            const std::unique_ptr<Filesystemitem>& b) {
             return *a < *b;
         });
-    sort_count=0;
+    changesort=0;
 }
 
 
@@ -246,4 +250,57 @@ void Filemanager::togglehidden(){
         showhidden=1;
         loaddirectory();
     }
+}
+
+void Filemanager::togglepreview()
+{
+    if(previewMode==0){
+        previewMode=1;
+    }
+    else{
+        previewMode=0;
+    }
+}
+
+bool Filemanager::getpreviewinfo(){
+    return previewMode;
+}
+
+std::string Filemanager::preview(fs::path& path)
+{
+    if (previewMode != 1) return "";
+
+    previewtext.clear();
+    std::error_code ec;
+
+    if (fs::is_directory(path, ec)) {
+        int count = 0;
+        for (const auto& entry : fs::directory_iterator(path, ec)) {
+            if (count++ >= 10) { previewtext += "...\n"; break; }
+            previewtext += entry.path().filename().string();
+            previewtext += entry.is_directory(ec) ? "/\n" : "\n";
+        }
+        if (previewtext.empty()) previewtext = "Empty directory";
+        return previewtext;
+    }
+
+    std::ifstream file(path, std::ios::binary);
+    if (!file) return previewtext = "Unable to open for preview";
+
+    char buf[512];
+    file.read(buf, sizeof(buf));
+    std::streamsize n = file.gcount();
+    if (n == 0) return previewtext = "File is empty";
+    if (std::memchr(buf, '\0', n)) return previewtext = "Preview not available";
+
+    file.clear();
+    file.seekg(0);
+    std::string line;
+    int count = 0;
+    while (count < 5 && std::getline(file, line)) {
+        if (line.size() > 80) line.resize(80);
+        previewtext += line + "\n";
+        count++;
+    }
+    return previewtext;
 }

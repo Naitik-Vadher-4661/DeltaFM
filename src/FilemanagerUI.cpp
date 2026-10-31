@@ -1,7 +1,9 @@
 #include "../include/FilemanagerUI.hpp"
 #include "../include/Exception.hpp"
+#include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
+#include <ftxui/dom/direction.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <string>
 
@@ -79,6 +81,7 @@ Element FilemanagerUI::buildscreen() {
             case Action::CreateFile:   prompt = "New file name:";   break;
             case Action::CreateFolder: prompt = "New folder name:"; break;
             case Action::Rename:       prompt = "Rename to:";       break;
+
         }
 
         Element popup = vbox({
@@ -88,6 +91,14 @@ Element FilemanagerUI::buildscreen() {
         }) | border | clear_under | size(WIDTH, GREATER_THAN, 40);
 
         return dbox({body, popup | center});
+    }
+    if (mode == Mode::Browsing && deltafm.getpreviewinfo() == 1) {
+        fs::path p = deltafm.getitems()[deltafm.getselected()]->getpath();
+        Element preview_window = paragraph(deltafm.preview(p))
+            | border
+            | size(WIDTH, EQUAL, 40);
+
+        return hbox({ body | flex, preview_window });
     }
 
     return body;
@@ -183,6 +194,11 @@ bool FilemanagerUI::onkey(Event event) {
             setstatus("Toggled hidden files");
             return true;
         }
+        if(event ==Event::Character('p')){
+            setstatus("Toggled Preview Mode");
+            deltafm.togglepreview();
+            return true;
+        }
     } catch (const FileException& e) {
         setstatus(e.what());
         return true;
@@ -239,6 +255,9 @@ void FilemanagerUI::finishtype() {
                 deltafm.renameselected(inputtext);
                 deltafm.loaddirectory();
                 break;
+
+
+
             case Action::None : break;
         }
     } catch ( FileException& e) {
