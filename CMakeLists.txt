@@ -40,7 +40,7 @@ add_executable(${PROJECT_NAME}
    src/Filemanager.cpp
    src/Logger.cpp
    src/FilemanagerUI.cpp
-   src/previewer.cpp
+
 )
 
 target_include_directories(${PROJECT_NAME}

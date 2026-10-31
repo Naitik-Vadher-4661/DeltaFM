@@ -1,20 +1,23 @@
+
 #include "../include/Filemanager.hpp"
 #include "../include/Fileitem.hpp"
 #include "../include/Directoryitem.hpp"
 #include "../include/Exception.hpp"
-
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <iostream>
 #include <algorithm>
 #include <system_error>
-
+#include<cstring>
 Filemanager::Filemanager(fs::path initialpath){
     p=initialpath;
     totalitem=-1;
     selectedIndex=0;
     showhidden=false;
+    changesort=0;
+    previewtext="Empty file!";
+    previewMode=0;
     loaddirectory();
 }
 
@@ -31,13 +34,11 @@ void Filemanager::loaddirectory(){
     totalitem=-1;
     std::error_code ec;
     for(auto const& dir_item : fs::directory_iterator{p,fs::directory_options::skip_permission_denied, ec}){
-        std::error_code stat_ec;
+        if(!dir_item.exists()) continue;
         if(!dir_item.is_directory()){
             if(showhidden){
 
-                if(stat_ec){
-                    continue;
-                }
+
             Fileitem f(dir_item);
             items.push_back(std::make_unique<Fileitem>(dir_item));
             totalitem++;
@@ -46,18 +47,12 @@ void Filemanager::loaddirectory(){
                 std::string n =dir_item.path().filename().string();
                 if(n[0]=='.') continue;
                 Fileitem f(dir_item);
-
                 items.push_back(std::make_unique<Fileitem>(dir_item));
                 totalitem++;
             }
         }
         else{
            if(showhidden){
-               fs::perms perms = fs::status(dir_item).permissions();
-
-               if(stat_ec){
-                   continue;
-               }
 
                Directoryitem d(dir_item);
                items.push_back(std::make_unique<Directoryitem>(dir_item));
@@ -126,7 +121,8 @@ catch(char c){}
 }
 
 void Filemanager::gotoparent(){
-
+	if(fs::current_path().root_path()==p){}
+	else{
     if(!items.empty()){
      p=items[0]->getpath().parent_path().parent_path();
 
@@ -138,6 +134,7 @@ void Filemanager::gotoparent(){
         selectedIndex=0;
         loaddirectory();
     }
+}
 }
 
 void Filemanager::createfile(std::string file_name){
@@ -223,11 +220,24 @@ void swap(std::unique_ptr<Filesystemitem>& a, std::unique_ptr<Filesystemitem>& b
 }
 
 void Filemanager::defaultsortitem() {
+if(changesort==0)
+{
     std::stable_sort(items.begin(), items.end(),
         [](const std::unique_ptr<Filesystemitem>& a,
            const std::unique_ptr<Filesystemitem>& b) {
             return a->getname() < b->getname();
         });
+    changesort=1;
+}
+else if(changesort==1) {
+    std::stable_sort(items.begin(), items.end(),
+        [](const std::unique_ptr<Filesystemitem>& a,
+           const std::unique_ptr<Filesystemitem>& b) {
+            return *a < *b;
+        });
+    changesort=0;
+}
+
 
 }
 
@@ -240,4 +250,57 @@ void Filemanager::togglehidden(){
         showhidden=1;
         loaddirectory();
     }
+}
+
+void Filemanager::togglepreview()
+{
+    if(previewMode==0){
+        previewMode=1;
+    }
+    else{
+        previewMode=0;
+    }
+}
+
+bool Filemanager::getpreviewinfo(){
+    return previewMode;
+}
+
+std::string Filemanager::preview(fs::path& path)
+{
+    if (previewMode != 1) return "";
+
+    previewtext.clear();
+    std::error_code ec;
+
+    if (fs::is_directory(path, ec)) {
+        int count = 0;
+        for (const auto& entry : fs::directory_iterator(path, ec)) {
+            if (count++ >= 10) { previewtext += "...\n"; break; }
+            previewtext += entry.path().filename().string();
+            previewtext += entry.is_directory(ec) ? "/\n" : "\n";
+        }
+        if (previewtext.empty()) previewtext = "Empty directory";
+        return previewtext;
+    }
+
+    std::ifstream file(path, std::ios::binary);
+    if (!file) return previewtext = "Unable to open for preview";
+
+    char buf[512];
+    file.read(buf, sizeof(buf));
+    std::streamsize n = file.gcount();
+    if (n == 0) return previewtext = "File is empty";
+    if (std::memchr(buf, '\0', n)) return previewtext = "Preview not available";
+
+    file.clear();
+    file.seekg(0);
+    std::string line;
+    int count = 0;
+    while (count < 5 && std::getline(file, line)) {
+        if (line.size() > 80) line.resize(80);
+        previewtext += line + "\n";
+        count++;
+    }
+    return previewtext;
 }
