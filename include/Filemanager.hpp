@@ -1,5 +1,6 @@
 #pragma once
 #include "Filesystemitem.hpp"
+
 #include <vector>
 
 class Filemanager{
@@ -9,7 +10,9 @@ class Filemanager{
         int selectedIndex;
         bool showhidden;
         int totalitem;
-        int sort_count;
+        int changesort;
+        std::string previewtext;
+        bool previewMode;
     public:
         Filemanager(fs::path intialpath);
         void loaddirectory();
@@ -27,4 +30,7 @@ class Filemanager{
         void defaultsortitem() ;
         void togglehidden();
         void swap(std::unique_ptr<Filesystemitem>& , std::unique_ptr<Filesystemitem>& );
+        std::string preview(fs::path&);
+        void togglepreview();
+        bool getpreviewinfo();
 };
