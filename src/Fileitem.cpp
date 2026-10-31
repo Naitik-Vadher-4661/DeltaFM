@@ -13,11 +13,14 @@ std::string Fileitem::getdisplaytext() {
 std::string full_line;
 std::string modtime=std::format("{:%Y-%m-%d %H:%M}", ftime);
 std::string sz=formatsize(size);
-
+std::string display_name=name;
+if(name.length()>24){
+display_name=name.substr(0,20)+"....";
+}
 
 std::ostringstream oss;
 oss << "📄 "
-    << std::left << std::setw(25) << name
+    << std::left << std::setw(25) << display_name
     << std::setw(12) << formatsize(size)
     << std::setw(20) << modtime
     << type;
