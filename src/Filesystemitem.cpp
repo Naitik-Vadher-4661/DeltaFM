@@ -22,6 +22,7 @@ Filesystemitem::Filesystemitem(const fs::path& p){         // initialize the obj
         }
         catch(int i){
             ftime=last_write_time(p);
+            ftime=ftime+std::chrono::hours(5)+std::chrono::minutes(30);
             per=fs::status(p).permissions();
             if(!fs::is_directory(p)){
 
