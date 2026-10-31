@@ -4,7 +4,6 @@
 #include <ftxui/component/event.hpp>
 #include <string>
 #include "Filemanager.hpp"
-#include "previewer.hpp"
 class FilemanagerUI{
     protected:
         Filemanager deltafm;
