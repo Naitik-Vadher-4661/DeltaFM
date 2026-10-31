@@ -34,3 +34,8 @@ class AlreadyExists : public FileException{
     public:
         AlreadyExists(fs::path p):FileException(p.filename().string()+" already exist!"){}
 };
+class EmptyFolder : public FileException{
+	public:
+		EmptyFolder(fs::path p):FileException(p.filename().string()+" Is Empty Folder"){}
+
+};
