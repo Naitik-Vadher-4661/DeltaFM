@@ -58,3 +58,5 @@ target_link_libraries(${PROJECT_NAME}
 install(PROGRAMS $<TARGET_FILE:${PROJECT_NAME}>
         DESTINATION bin
         RENAME dfm${CMAKE_EXECUTABLE_SUFFIX})
+target_compile_definitions(DeltaFM PRIVATE
+    PROJECT_ROOT="${CMAKE_SOURCE_DIR}")

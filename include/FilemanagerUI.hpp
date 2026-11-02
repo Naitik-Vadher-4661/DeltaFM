@@ -4,6 +4,7 @@
 #include <ftxui/component/event.hpp>
 #include <string>
 #include "Filemanager.hpp"
+#include "Logger.hpp"
 class FilemanagerUI{
     protected:
         Filemanager deltafm;
@@ -13,7 +14,7 @@ class FilemanagerUI{
         std::string inputtext;
         Mode mode;
         Action pendingaction;
-
+        Logger deltalogger;
 
 
     public:

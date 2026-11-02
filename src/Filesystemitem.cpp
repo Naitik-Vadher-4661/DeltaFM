@@ -3,7 +3,7 @@
 #include "../include/Filesystemitem.hpp"
 #include "../include/Exception.hpp"
 #include <filesystem>
-#include<exception>
+
 // namespace fs = std::filesystem;   this is commented because include fsi.hpp has already declared fs
 
 int Filesystemitem::itemcount=0;     // declares the total objects
@@ -22,6 +22,7 @@ Filesystemitem::Filesystemitem(const fs::path& p){         // initialize the obj
         }
         catch(int i){
             ftime=last_write_time(p);
+            ftime=ftime+std::chrono::hours(5)+std::chrono::minutes(30);
             per=fs::status(p).permissions();
             if(!fs::is_directory(p)){
 
