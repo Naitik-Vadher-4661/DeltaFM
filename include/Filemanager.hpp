@@ -26,7 +26,7 @@ class Filemanager{
         void createfile(std::string);
         void createfolder(std::string);
         void deleteselected();
-        void renameselected(std::string);
+        void renameselected(fs::path,fs::path);
         void defaultsortitem() ;
         void togglehidden();
         void swap(std::unique_ptr<Filesystemitem>& , std::unique_ptr<Filesystemitem>& );

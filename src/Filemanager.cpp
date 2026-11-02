@@ -193,10 +193,10 @@ void Filemanager::deleteselected(){
     loaddirectory();
 }
 
-void Filemanager::renameselected(std::string new_name){
+void Filemanager::renameselected(fs::path old_path,fs::path new_path){
     try{
         for(auto const& dir_item : fs::directory_iterator{p}){
-            if(new_name==dir_item.path().filename().string())
+            if(new_path==dir_item.path().filename())
             {
 
                 throw  AlreadyExists (dir_item.path()) ;
@@ -209,7 +209,7 @@ void Filemanager::renameselected(std::string new_name){
     }
 
      catch(int i){
-         fs::rename(items[selectedIndex]->getpath(),new_name);
+         fs::rename(old_path,new_path);
       }
 
 loaddirectory();
@@ -276,7 +276,7 @@ std::string Filemanager::preview(fs::path& path)
     if (fs::is_directory(path, ec)) {
         int count = 0;
         for (const auto& entry : fs::directory_iterator(path, ec)) {
-            if (count++ >= 10) { previewtext += "...\n"; break; }
+            if (count++ >= 30) { previewtext += "...\n"; break; }
             previewtext += entry.path().filename().string();
             previewtext += entry.is_directory(ec) ? "/\n" : "\n";
         }
@@ -297,7 +297,7 @@ std::string Filemanager::preview(fs::path& path)
     file.seekg(0);
     std::string line;
     int count = 0;
-    while (count < 5 && std::getline(file, line)) {
+    while (count < 15 && std::getline(file, line)) {
         if (line.size() > 80) line.resize(80);
         previewtext += line + "\n";
         count++;

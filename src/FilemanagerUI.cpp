@@ -57,7 +57,7 @@ Element FilemanagerUI::buildscreen() {
         buildlist(),
         separator(),
         text(" " + statusmsg),
-        text(" ↑ up | ↓ down | → open | ← previous | n file | f folder | r rename | d delete | s sort | h hidden | q quit") | dim,
+        text(" ↑ up | ↓ down | → open | ← previous | n file | f folder | r rename | d delete | s sort | h hidden |p preview | q quit") | dim,
     }) | border;
     if (mode == Mode::Confirming) {
            const auto& items = deltafm.getitems();
@@ -248,19 +248,19 @@ void FilemanagerUI::finishtype() {
                 setstatus("Created file " + inputtext);
                 deltafm.createfile(inputtext);
                 deltalogger.Log("Created File "+inputtext);
-                deltafm.loaddirectory();
+
                 break;
             case Action::CreateFolder:
                 setstatus("Created folder " + inputtext);
                 deltafm.createfolder(inputtext);
                 deltalogger.Log("Created Directory "+inputtext);
-                deltafm.loaddirectory();
+
                 break;
             case Action::Rename:
-                 setstatus("Renamed to " + inputtext);
+                setstatus("Renamed to " + inputtext);
                 deltalogger.Log("Renamed "+deltafm.getitems()[deltafm.getselected()]->getname()+" To "+inputtext);
-                deltafm.renameselected(inputtext);
-                deltafm.loaddirectory();
+                deltafm.renameselected(deltafm.getitems()[deltafm.getselected()]->getpath(),deltafm.getitems()[deltafm.getselected()]->getpath().parent_path() / inputtext);
+
                 break;
 
 
