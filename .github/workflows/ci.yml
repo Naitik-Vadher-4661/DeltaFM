@@ -3,10 +3,15 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - '.github'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - '.github'
   workflow_dispatch:
-
 jobs:
   build:
     name: Build (${{ matrix.os }}, ${{ matrix.compiler }})
