@@ -276,7 +276,7 @@ std::string Filemanager::preview(fs::path& path)
     if (fs::is_directory(path, ec)) {
         int count = 0;
         for (const auto& entry : fs::directory_iterator(path, ec)) {
-            if (count++ >= 10) { previewtext += "...\n"; break; }
+            if (count++ >= 30) { previewtext += "...\n"; break; }
             previewtext += entry.path().filename().string();
             previewtext += entry.is_directory(ec) ? "/\n" : "\n";
         }
@@ -297,7 +297,7 @@ std::string Filemanager::preview(fs::path& path)
     file.seekg(0);
     std::string line;
     int count = 0;
-    while (count < 5 && std::getline(file, line)) {
+    while (count < 15 && std::getline(file, line)) {
         if (line.size() > 80) line.resize(80);
         previewtext += line + "\n";
         count++;
