@@ -4,18 +4,30 @@ A TUI based File Manager Written in c++
 
 ## ScreenShots 
 
+### DeltaFM main UI
 
-<img width="1366" height="768" alt="Screenshot from 2026-10-24 22-42-54" src="https://github.com/user-attachments/assets/edbce2a6-25f7-4f48-85e4-bbb4a4bef869" />
+<img width="1366" height="768" alt="Screenshot from 2026-11-02 20-51-45" src="https://github.com/user-attachments/assets/a25f1698-6a57-4f96-93e5-b1881d58db26" />
 
-                                                                                                                 
-                                                                                                                 
-                                                                                                                 
- 
-                                                                                                                       
-<img width="1351" height="750" alt="Screenshot from 2026-10-24 22-43-48" src="https://github.com/user-attachments/assets/d2a5a1bc-8677-4982-930a-d09e138582a1" />
+### Features
 
-                                                                                                                
-                                                                                                                       
+#### Delta Previewer and logs
+
+<img width="1366" height="768" alt="Screenshot from 2026-11-02 20-52-03" src="https://github.com/user-attachments/assets/11fa9564-5149-46e8-8fc8-2c89a2f8c22f" />                                                                                                     
+
+#### Creating File
+
+<img width="1366" height="768" alt="Screenshot from 2026-11-02 20-52-28" src="https://github.com/user-attachments/assets/4d2f7c06-9715-4786-893f-e28b439d333b" />
+
+#### Deleting File
+
+<img width="1366" height="768" alt="Screenshot from 2026-11-02 20-52-52" src="https://github.com/user-attachments/assets/448fffb3-305e-4aa1-adfa-2a4e8887d570" />
+
+
+
+
+
+
+
                                                                                                                        
 # Installation
 
