@@ -3,9 +3,16 @@ name: Windows Build
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - '.github'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - '.github'
   workflow_dispatch:
+   
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
