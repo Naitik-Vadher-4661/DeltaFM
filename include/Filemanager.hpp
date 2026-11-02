@@ -33,4 +33,5 @@ class Filemanager{
         std::string preview(fs::path&);
         void togglepreview();
         bool getpreviewinfo();
+        void togglesort();
 };

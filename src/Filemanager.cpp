@@ -87,13 +87,13 @@ void Filemanager::movedown(){
 
 void Filemanager::gotochild(){
 try{
-    if(items.empty())
-	{
+    if(items.empty()){
 		throw EmptyFolder(p);
 	}
-else{
-    if(items[selectedIndex]->gettype()=="Directory")
-    {
+
+    else{
+        if(items[selectedIndex]->gettype()=="Directory")
+        {
         try{
             fs::perms perms = fs::status(items[selectedIndex]->getpath()).permissions();
 
@@ -112,7 +112,7 @@ else{
             p=items[selectedIndex]->getpath();
              selectedIndex=0;
              loaddirectory();
-    }
+        }
 
     }
 }
@@ -227,7 +227,7 @@ if(changesort==0)
            const std::unique_ptr<Filesystemitem>& b) {
             return a->getname() < b->getname();
         });
-    changesort=1;
+
 }
 else if(changesort==1) {
     std::stable_sort(items.begin(), items.end(),
@@ -235,7 +235,7 @@ else if(changesort==1) {
            const std::unique_ptr<Filesystemitem>& b) {
             return *a < *b;
         });
-    changesort=0;
+
 }
 
 
@@ -303,4 +303,9 @@ std::string Filemanager::preview(fs::path& path)
         count++;
     }
     return previewtext;
+}
+
+void Filemanager::togglesort(){
+    if(changesort==1) changesort=0;
+    else changesort=1;
 }

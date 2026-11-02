@@ -115,7 +115,9 @@ bool FilemanagerUI::onkey(Event event) {
                    std::string name = items[deltafm.getselected()]->getname();
                    try {
                        deltafm.deleteselected();
+                       deltalogger.Log("Deleted "+name);
                        setstatus("Deleted " + name);
+
                    } catch (const FileException& e) {
                        setstatus(e.what());
                    }
@@ -185,6 +187,7 @@ bool FilemanagerUI::onkey(Event event) {
                        return true;
         }
         if (event == Event::Character('s')) {
+            deltafm.togglesort();
             deltafm.defaultsortitem();
             setstatus("Sorted");
             return true;
@@ -232,6 +235,7 @@ bool FilemanagerUI::handletype(Event event) {
 }
 
 void FilemanagerUI::finishtype() {
+
     if (inputtext.empty()) {
         setstatus("Name cannot be empty");
         mode = Mode::Browsing;
@@ -243,15 +247,18 @@ void FilemanagerUI::finishtype() {
             case Action::CreateFile:
                 setstatus("Created file " + inputtext);
                 deltafm.createfile(inputtext);
+                deltalogger.Log("Created File "+inputtext);
                 deltafm.loaddirectory();
                 break;
             case Action::CreateFolder:
                 setstatus("Created folder " + inputtext);
                 deltafm.createfolder(inputtext);
+                deltalogger.Log("Created Directory "+inputtext);
                 deltafm.loaddirectory();
                 break;
             case Action::Rename:
                  setstatus("Renamed to " + inputtext);
+                deltalogger.Log("Renamed "+deltafm.getitems()[deltafm.getselected()]->getname()+" To "+inputtext);
                 deltafm.renameselected(inputtext);
                 deltafm.loaddirectory();
                 break;
