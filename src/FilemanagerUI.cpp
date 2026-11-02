@@ -248,19 +248,19 @@ void FilemanagerUI::finishtype() {
                 setstatus("Created file " + inputtext);
                 deltafm.createfile(inputtext);
                 deltalogger.Log("Created File "+inputtext);
-                deltafm.loaddirectory();
+
                 break;
             case Action::CreateFolder:
                 setstatus("Created folder " + inputtext);
                 deltafm.createfolder(inputtext);
                 deltalogger.Log("Created Directory "+inputtext);
-                deltafm.loaddirectory();
+
                 break;
             case Action::Rename:
-                 setstatus("Renamed to " + inputtext);
+                setstatus("Renamed to " + inputtext);
                 deltalogger.Log("Renamed "+deltafm.getitems()[deltafm.getselected()]->getname()+" To "+inputtext);
-                deltafm.renameselected(inputtext);
-                deltafm.loaddirectory();
+                deltafm.renameselected(deltafm.getitems()[deltafm.getselected()]->getpath(),deltafm.getitems()[deltafm.getselected()]->getpath().parent_path() / inputtext);
+
                 break;
 
 

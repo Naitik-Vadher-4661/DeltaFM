@@ -193,10 +193,10 @@ void Filemanager::deleteselected(){
     loaddirectory();
 }
 
-void Filemanager::renameselected(std::string new_name){
+void Filemanager::renameselected(fs::path old_path,fs::path new_path){
     try{
         for(auto const& dir_item : fs::directory_iterator{p}){
-            if(new_name==dir_item.path().filename().string())
+            if(new_path==dir_item.path().filename())
             {
 
                 throw  AlreadyExists (dir_item.path()) ;
@@ -209,7 +209,7 @@ void Filemanager::renameselected(std::string new_name){
     }
 
      catch(int i){
-         fs::rename(items[selectedIndex]->getpath(),new_name);
+         fs::rename(old_path,new_path);
       }
 
 loaddirectory();
