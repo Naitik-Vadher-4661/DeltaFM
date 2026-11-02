@@ -55,20 +55,26 @@ dfm
 
 ### For MacOS
 ```
-brew install libmagic
-curl -fL -o DeltaFM https://github.com/Naitik-Vadher-4661/DeltaFM/releases/download/Deltafm/DeltaFM_mac
-chmod +x DeltaFM
-xattr -d com.apple.quarantine DeltaFM 2>/dev/null
-sudo mv DeltaFM /usr/local/bin/dfm
-dfm
+  brew install libmagic
+  curl -fL -o DeltaFM https://github.com/Naitik-Vadher-4661/DeltaFM/releases/download/Deltafm/DeltaFM_mac
+  chmod +x DeltaFM
+  xattr -d com.apple.quarantine DeltaFM 2>/dev/null
+  sudo mkdir -p /usr/local/bin
+  sudo mv DeltaFM /usr/local/bin/dfm
+  dfm
 ```
 
 ### for Windows
 ```
-vcpkg install libmagic:x64-windows
-mkdir C:\DeltaFM\bin
-curl.exe -fL -o C:\DeltaFM\bin\dfm.exe https://github.com/Naitik-Vadher-4661/DeltaFM/releases/download/Deltafm/DeltaFM.exe
-[Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path","User") + ";C:\DeltaFM\bin", "User")
+$dir = "C:\DeltaFM\bin"
+$zip = "$env:TEMP\DeltaFM_windows.zip"
+New-Item -ItemType Directory -Force $dir | Out-Null
+curl.exe -fL -o $zip https://github.com/Naitik-Vadher-4661/DeltaFM/releases/download/Deltafm/DeltaFM_windows.zip
+Expand-Archive -Force $zip $dir
+Move-Item -Force "$dir\DeltaFM.exe" "$dir\dfm.exe"
+Remove-Item $zip
+$p = [Environment]::GetEnvironmentVariable("Path","User")
+if (($p -split ';') -notcontains $dir) { [Environment]::SetEnvironmentVariable("Path", "$p;$dir", "User") }
 ```
 Close PowerShell, open a new one and  run `dfm`.
 
@@ -113,22 +119,23 @@ Close PowerShell, open a new one and  run `dfm`.
 
  You have to have vcpkg installed if not use this
  ```
- git clone https://github.com/microsoft/vcpkg C:\vcpkg
- C:\vcpkg\bootstrap-vcpkg.bat
- C:\vcpkg\vcpkg install libmagic:x64-windows
 
- ```
+git clone https://github.com/microsoft/vcpkg C:\vcpkg
+C:\vcpkg\bootstrap-vcpkg.bat
+C:\vcpkg\vcpkg install libmagic:x64-windows
+```
+After vcpkg is installed or already installed compile from source 
+```
+git clone https://github.com/Naitik-Vadher-4661/DeltaFM.git
+cd DeltaFM
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
+cmake --build build --config Release --parallel
+cmake --install build --config Release --prefix C:\DeltaFM
+copy build\Release\*.dll C:\DeltaFM\bin\
 
- DeltaFM for windows
- ```
- vcpkg install libmagic:x64-windows
- git clone https://github.com/Naitik-Vadher-4661/DeltaFM.git
- cd DeltaFM
- cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows
- cmake --build build --config Release --parallel
- cmake --install build --config Release --prefix C:\DeltaFM
- copy build\Release\*.dll C:\DeltaFM\bin\
- [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path","User") + ";C:\DeltaFM\bin", "User")
+$dir = "C:\DeltaFM\bin"
+$p = [Environment]::GetEnvironmentVariable("Path","User")
+if (($p -split ';') -notcontains $dir) { [Environment]::SetEnvironmentVariable("Path", "$p;$dir", "User") }
  ```
 
 
@@ -137,17 +144,20 @@ Close PowerShell, open a new one and  run `dfm`.
 #### Arch / CachyOS
 ```
 sudo rm /usr/local/bin/dfm
+sudo rm -rf "${XDG_STATE_HOME:-$HOME/.local/state}/deltafm"
 ```
 
 #### Ubuntu / Debian
 ```
 sudo rm /usr/local/bin/dfm
+sudo rm -rf "${XDG_STATE_HOME:-$HOME/.local/state}/deltafm"
 ```
 
 
 #### macOS
 ```
 sudo rm /usr/local/bin/dfm
+sudo rm -rf "$HOME/Library/Logs/DeltaFM"
 ```
 
 #### Windows (PowerShell)
@@ -155,6 +165,7 @@ sudo rm /usr/local/bin/dfm
 $p = [Environment]::GetEnvironmentVariable("Path","User") -split ';' | Where-Object { $_ -ne 'C:\DeltaFM\bin' }
 [Environment]::SetEnvironmentVariable("Path", ($p -join ';'), "User")
 Remove-Item -Recurse -Force C:\DeltaFM
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\DeltaFM"
 ```
 The first two lines remove `C:\DeltaFM\bin` from your PATH, and the last one deletes the folder. Open a new terminal afterwards. 
 
